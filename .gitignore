@@ -1,0 +1,14 @@
+# environment / caches
+.venv/
+__pycache__/
+*.pyc
+
+# research, reference material, build scripts and the halo_forge reference project (not needed to generate circles)
+.ignore/
+
+# CLI output written to the repo root by default
+/circle_*.svg
+/circle_*.png
+/circle_*.circle.json
+/sheet.png
+/registry.jsonl
