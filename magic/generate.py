@@ -30,7 +30,9 @@ WEIGHTS = {
     "bold": {"heavy": 0.026, "medium": 0.013, "thin": 0.0066, "hair": 0.0040},
     "fine": {"heavy": 0.012, "medium": 0.0072, "thin": 0.0043, "hair": 0.0029},
 }
-MIN_SEP = 0.012        # absolute minimum distance between concentric ring lines
+# what sits behind a kamea sigil trace (never a full grid: it reads as graph paper inside a round circle)
+SIGIL_BACKDROP = {"none": 4, "dots": 3, "marks": 2}
+MIN_SEP = 0.012       # absolute minimum distance between concentric ring lines
 MIN_TEXT = 0.032       # absolute minimum text band width
 
 # band kind -> (min width, max width) local at the root, edge rings (p outer line, p inner line)
@@ -148,7 +150,7 @@ PRESETS = {
                            "keys": 1},
                      text=0.75, text2=0.3, segments=0.35,
                      fig={"star": 6, "lens": 1, "spokes": 1, "chain": 1, "compass": 1, "lattice": 1, "none": 1,
-                          "grid": 1, "triangles": 1, "twist": 2, "overlay": 3},
+                          "triangles": 1, "twist": 2, "overlay": 3},
                      star_modes={"line": 3, "weave": 2, "lanew": 1, "lane": 1, "merge": 1}, nodes=0.45, pierce=0.08,
                      tower=(1, 2), center={"symbol": 3, "bullseye": 2, "sunburst": 1, "star": 2, "eye": 1, "rosette": 1,
                                            "spiral": 1, "maze": 1, "sigil": 1, "seal": 1, "dot": 1, "crescent": 1,
@@ -597,7 +599,7 @@ def sample_fig(st: S, rc, s, depth, tower_left=0):
     elif kind == "sigil":
         f.update(method=rng.choice(["kamea", "kamea", "kamea", "wheel"]), sq=rng.choice([3, 4, 5, 6, 7, 8, 9]),
                  sym=rng.randrange(8), map=rng.choice(["pyth", "abc"]), end=rng.choice(["bar", "bar", "arrow", "circle"]),
-                 grid=rng.random() < 0.8, cells=rng.random() < 0.5, rings=rng.choice([(6, 8, 12), (5, 8, 13), (3, 7, 12)]))
+                 backdrop=pick(rng, SIGIL_BACKDROP), rings=rng.choice([(6, 8, 12), (5, 8, 13), (3, 7, 12)]))
     elif kind == "seal":
         f["gseed"] = rng.randrange(1 << 30)
     elif kind == "grid":
@@ -641,7 +643,7 @@ def sample_center(st: S, r, s, depth):
         c["diag"] = rng.random() < 0.5
     elif kind == "sigil":
         c.update(method="kamea", sq=rng.choice([3, 4, 5, 6]), sym=rng.randrange(8), map="pyth", end="bar",
-                 grid=rng.random() < 0.4)
+                 backdrop=pick(rng, SIGIL_BACKDROP))
     elif kind == "seal":
         c["gseed"] = rng.randrange(1 << 30)
     elif kind == "polys":

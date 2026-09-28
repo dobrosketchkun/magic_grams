@@ -339,10 +339,20 @@ def draw_sigil(cv, f, ctx):
     if f.get("method", "kamea") == "kamea":
         g = sigil.kamea(text, f.get("sq", 5), f.get("sym", 0), f.get("map", "pyth"), f.get("end", "bar"))
         side = r * 1.3
+        n = f.get("sq", 5)
+        back = f.get("backdrop") or ("dots" if f.get("cells") else "none")
         with cv.at(0, 0, side, 0):
-            if f.get("grid"):
-                for q in g["grid"]:
-                    cv.poly(np.asarray(q) - 0.5, False, "hair", ctx["zf"], ctx["tags"], glow=0.4)
+            if back == "dots":                                # faint dots on every cell
+                for i in range(n):
+                    for j in range(n):
+                        cv.dot(0.025 / n, (i + 0.5) / n - 0.5, (j + 0.5) / n - 0.5, z=ctx["zf"], tags=ctx["tags"], glow=0.5)
+            elif back == "marks":                               # tiny crosses where grid lines would meet
+                e = 0.06 / n
+                for i in range(1, n):
+                    for j in range(1, n):
+                        x, y = i / n - 0.5, j / n - 0.5
+                        cv.line((x - e, y), (x + e, y), "hair", ctx["zf"], ctx["tags"], glow=0.4)
+                        cv.line((x, y - e), (x, y + e), "hair", ctx["zf"], ctx["tags"], glow=0.4)
             for s in g["s"]:
                 cv.poly(np.asarray(s) - 0.5, False, f.get("tier", "thin"), ctx["zf"] + 0.5, ctx["tags"])
             for x, y, rr, fl in g["c"]:
@@ -350,13 +360,8 @@ def draw_sigil(cv, f, ctx):
                     cv.dot(rr, x - 0.5, y - 0.5, z=ctx["zf"] + 0.5, tags=ctx["tags"])
                 else:
                     cv.circle(rr, x - 0.5, y - 0.5, tier=f.get("tier", "thin"), z=ctx["zf"] + 0.5, tags=ctx["tags"])
-            n = f.get("sq", 5)
             for x, y in g["s"][0][1:-1]:                       # every traced letter cell lights up
                 cv.dot(0.07 / n, x - 0.5, y - 0.5, z=ctx["zf"] + 0.5, tags=ctx["tags"])
-            if f.get("cells"):                                  # faint dots on the untraced cells
-                for i in range(n):
-                    for j in range(n):
-                        cv.dot(0.025 / n, (i + 0.5) / n - 0.5, (j + 0.5) / n - 0.5, z=ctx["zf"], tags=ctx["tags"], glow=0.5)
     else:
         g = sigil.wheel(text, tuple(f.get("rings", (6, 8, 12))), ctx["phase"], f.get("end", "bar"))
         side = r * 2.0
