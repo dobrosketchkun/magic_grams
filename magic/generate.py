@@ -196,7 +196,10 @@ def _as_weights(v):
 def _blend(own, broad, k=0.7):
     a, b = _as_weights(own), _as_weights(broad)
     sa, sb = sum(a.values()), sum(b.values())
-    return {x: k * a.get(x, 0) / sa + (1 - k) * b.get(x, 0) / sb for x in set(a) | set(b)}
+    # insertion order must not depend on set iteration (string hashes are randomised per process): the weighted
+    # picks walk the keys in order, so an unordered merge would give every run a different circle for the same seed
+    keys = list(a) + [x for x in b if x not in a]
+    return {x: k * a.get(x, 0) / sa + (1 - k) * b.get(x, 0) / sb for x in keys}
 
 
 def _widen():
